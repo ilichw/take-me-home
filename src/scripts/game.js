@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import './style.css';
 
 const config = {
   type: Phaser.CANVAS,
