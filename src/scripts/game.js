@@ -2,9 +2,15 @@ import Phaser from 'phaser';
 
 const config = {
   type: Phaser.CANVAS,
-  width: 800,
-  height: 600,
-  id: 'game',
+  width: 640,
+  height: 480,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },
+      debug: false
+    }
+  },
   scene: {
     preload: preload,
     create: create,
@@ -15,11 +21,11 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-  // Загрузка активов
+  this.load.image('ball', './src/assets/ball.png');
 }
 
 function create() {
-  // Инициализация игры
+  this.add.image(50, 50, 'ball');
 }
 
 function update() {
