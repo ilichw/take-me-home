@@ -19,15 +19,36 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+let ball, cursors;
 
 function preload() {
   this.load.image('ball', './src/assets/ball.png');
+  cursors = this.input.keyboard.createCursorKeys();
 }
 
 function create() {
-  this.add.image(50, 50, 'ball');
+  ball = this.physics.add.sprite(50, 50, 'ball');
 }
 
 function update() {
-  // Логика обновления игры
+  // Инициализация скорости
+  let velocityX = 0;
+  let velocityY = 0;
+
+  if (cursors.left.isDown) {
+    velocityX = -160;
+  }
+  if (cursors.right.isDown) {
+    velocityX = 160;
+  }
+  if (cursors.up.isDown) {
+    velocityY = -160;
+  }
+  if (cursors.down.isDown) {
+    velocityY = 160;
+  }
+
+  // Устанавливаем скорость
+  ball.setVelocityX(velocityX);
+  ball.setVelocityY(velocityY);
 }
