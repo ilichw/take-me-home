@@ -1,3 +1,6 @@
+# Old and auxiliary js files
+___*.js
+
 # Logs
 logs
 *.log
