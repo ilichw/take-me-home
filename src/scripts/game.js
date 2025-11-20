@@ -2,8 +2,8 @@ import Phaser from 'phaser';
 
 const config = {
   type: Phaser.CANVAS,
-  width: 640,
-  height: 480,
+  width: 800,
+  height: 600,
   physics: {
     default: 'arcade',
     arcade: {
@@ -19,15 +19,58 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-let ball, cursors;
+let player, cursors, platforms;
 
 function preload() {
-  this.load.image('ball', './src/assets/ball.png');
+  this.load.image('player', './src/assets/player.png');
+  this.load.image('ground', './src/assets/ground.png');
+  // this.load.image('myTexture', 'assets/myTexture.png'); // Загружаем текстуру
+
   cursors = this.input.keyboard.createCursorKeys();
 }
 
 function create() {
-  ball = this.physics.add.sprite(50, 50, 'ball');
+  platforms = this.physics.add.staticGroup();
+
+  platforms.create(25, 25, 'ground').setOrigin(0, 0); // верхняя граница
+  platforms
+    .create(800 - 25, 25, 'ground')
+    .setOrigin(0, 0)
+    .setAngle(90); // правая
+  platforms.create(0, 600 - 25, 'ground').setOrigin(0, 0); // нижняя
+  platforms.create(50, 25, 'ground').setOrigin(0, 0).setAngle(90); // левая
+
+  player = this.physics.add.sprite(100, 100, 'player');
+
+  // Создаем Graphics для рисования, но не будем заполнять текстурой
+  // const graphics = this.add.graphics();
+  // Создаем спрайт с текстурой, которая будет повторяться
+  const rectangleSprite = this.physics.add.sprite(200, 200, 'myTexture');
+
+  // Определяем размеры и позицию прямоугольника
+  const width = 500;
+  const height = 100;
+  // const x = 200;
+  // const y = 200;
+  rectangleSprite.setDisplaySize(width, height); // Устанавливаем размеры спрайта
+
+  // Используем Repeat для текстуры
+  rectangleSprite.setTexture('myTexture');
+  rectangleSprite.displayWidth = width; // Устанавливаем ширину
+  rectangleSprite.displayHeight = height; // Устанавливаем высоту
+
+  // Устанавливаем текстуру как повторяющуюся
+  rectangleSprite.setScale(width / rectangleSprite.width, height / rectangleSprite.height);
+  // Рисуем прямоугольник (если нужно, можете использовать цвет)
+  // graphics.fillStyle(0xffffff, 1); // Если нужно, цвет фона (можно убрать)
+  // graphics.fillRect(x, y, width, height); // Рисуем графику, предпочтительным вариантом будет задать цвет
+
+  // Удаляем графику, если она не нужна
+  // graphics.destroy();
+
+  // Создаем спрайт для текстуры
+  // const rectangleSprite = this.physics.add.sprite(x, y, 'ground');
+  // rectangleSprite.setDisplaySize(width, height); // Устанавливаем размеры спрайта в соответствии с прямоугольником
 }
 
 function update() {
@@ -49,6 +92,6 @@ function update() {
   }
 
   // Устанавливаем скорость
-  ball.setVelocityX(velocityX);
-  ball.setVelocityY(velocityY);
+  player.setVelocityX(velocityX);
+  player.setVelocityY(velocityY);
 }
