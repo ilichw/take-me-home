@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import defaultSettings from '../config';
+import generateMap from '../scripts/generateMap';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -7,7 +8,7 @@ export default class MainScene extends Phaser.Scene {
 
     // инициализация игровых настроек
     this.settings = {}; // настройки которые могут быть изменены
-    this.defaults = {}; // настройки которые не меняются в процессе игры
+    // this.defaults = {}; // настройки которые не меняются в процессе игры
 
     // Настройки игрока
     this.settings.player = {};
@@ -21,10 +22,10 @@ export default class MainScene extends Phaser.Scene {
     this.settings.mobs.maxCount = defaultSettings.mobs.maxCount;
 
     // Настройки генерации мира
-    this.defaults.tileSize = defaultSettings.tileSize;
-    this.defaults.mapWidth = defaultSettings.fieldWidth / this.defaults.tileSize;
-    this.defaults.mapHeight = defaultSettings.fieldHeight / this.defaults.tileSize;
-    this.settings.tileArray = [];
+    this.tileSize = defaultSettings.tileSize;
+    this.mapWidth = defaultSettings.fieldWidth / this.tileSize;
+    this.mapHeight = defaultSettings.fieldHeight / this.tileSize;
+    this.tileArray = [];
   }
 
   preload() {
@@ -32,12 +33,32 @@ export default class MainScene extends Phaser.Scene {
     this.load.image('mob', './src/assets/mob.png');
     this.load.image('wall', './src/assets/wall.png');
     this.load.image('floor', './src/assets/floor.png');
+    this.load.image('tiles', './src/assets/tileset.png');
+    this.load.tilemapTiledJSON('map', './src/assets/lvl1.json');
   }
 
   create() {
-    // Создание стен
+    // Создание карты
     this.walls = this.physics.add.staticGroup();
-    this.generateMap();
+    this.createMap();
+
+    // Создание игрока
+    // let startX = this.settings.player.startX,
+    //   startY = this.settings.player.startY,
+    //   setXCoef = (startX) => (this.mapWidth * this.tileSize) / startX - 1,
+    //   setYCoef = (startY) => (this.mapHeight * this.tileSize) / startY - 1,
+    //   xCoef = setXCoef(startX),
+    //   yCoef = setYCoef(startY);
+
+    // while (this.tileArray[yCoef][xCoef] !== 1) {
+    //   startX -= this.tileSize;
+    //   startY -= this.tileSize;
+    //   xCoef = setXCoef(startX);
+    //   yCoef = setYCoef(startY);
+    // }
+
+    // this.player = this.physics.add.sprite(startX, startY, 'player');
+    // this.player.setCollideWorldBounds(true);
 
     // Создание игрока
     this.player = this.physics.add.sprite(
@@ -100,17 +121,17 @@ export default class MainScene extends Phaser.Scene {
     this.scene.start('GameOverScene');
   }
 
-  generateMap() {
-    for (let y = 0; y < this.defaults.mapHeight; y++) {
-      this.settings.tileArray[y] = [];
-      for (let x = 0; x < this.defaults.mapWidth; x++) {
-        // Генерация случайного типа плитки
-        const tileType = Phaser.Math.Between(0, 1); // 0 - стена, 1 - пол
-        this.settings.tileArray[y][x] = tileType;
+  createMap() {
+    this.tileArray = generateMap(this.mapWidth, this.mapHeight);
 
-        const coef = this.defaults.tileSize / 2,
-          xCen = x * this.defaults.tileSize - coef,
-          yCen = y * this.defaults.tileSize - coef;
+    // заполнение поля
+    for (let y = 0; y < this.mapHeight; y++) {
+      for (let x = 0; x < this.mapWidth; x++) {
+        const tileType = this.tileArray[y][x];
+
+        const coef = this.tileSize / 2, // для позиционирования
+          xCen = x * this.tileSize + coef, // чтобы по центру
+          yCen = y * this.tileSize + coef; // без setOrigin
         if (tileType === 0) {
           this.walls.create(xCen, yCen, 'wall').setScale(1).refreshBody();
         } else {
